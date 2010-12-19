@@ -23,13 +23,14 @@ AC_LANG_PUSH([C++])
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_LONG_DOUBLE
 
-AC_ARG_WITH([openmp],
-    [AS_HELP_STRING([--with-openmp=yes|no], [Use OpenMP if available.])],
-    [ # option '--with-openmp' given
-      if test "_$withval" != _no ; then :
-         AC_OPENMP
-      fi
-    ])
+dnl One day, `sms-reord` will use OpenMP for speedup...
+dnl AC_ARG_WITH([openmp],
+dnl     [AS_HELP_STRING([--with-openmp=yes|no], [Use OpenMP if available.])],
+dnl     [ # option '--with-openmp' given
+dnl       if test "_$withval" != _no ; then :
+dnl          AC_OPENMP
+dnl       fi
+dnl     ])
 
 
 # Checks for library functions.
