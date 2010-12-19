@@ -3,7 +3,7 @@
 ##
 
 AC_PREREQ([2.63])
-AC_INIT([matools],[1.0],[riccardo.murri@gmail.com])
+AC_INIT([smasto],[0.10.12],[riccardo.murri@gmail.com])
 AC_CONFIG_SRCDIR([sms-norm.cpp])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
@@ -19,7 +19,10 @@ AC_PROG_INSTALL
 AC_LANG_PUSH([C++])
 
 
-# check for OpenMP
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_LONG_LONG_INT
+AC_TYPE_LONG_DOUBLE
+
 AC_ARG_WITH([openmp],
     [AS_HELP_STRING([--with-openmp=yes|no], [Use OpenMP if available.])],
     [ # option '--with-openmp' given
@@ -27,12 +30,6 @@ AC_ARG_WITH([openmp],
          AC_OPENMP
       fi
     ])
-AM_CONDITIONAL([HAVE_OPENMP], [test "_$OPENMP_CXXFLAGS" != '_'])
-
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_LONG_LONG_INT
-AC_TYPE_LONG_DOUBLE
 
 
 # Checks for library functions.
