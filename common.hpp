@@ -29,9 +29,8 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-/** Version of the sources. */
-#define VERSION "0.10.12"
 
+#include "config.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -162,12 +161,6 @@ public:
   FilterProgram();
   /** Destructor, override in derived classes. */
   virtual ~FilterProgram();
-
-  /** Short name of the program.  Used in usage help text. */
-  std::string name;
-
-  /** Version string.  Used in usage help text. */
-  std::string version;
 
   /** Descriptive text, used in usage help text. */
   std::string description;
@@ -369,7 +362,7 @@ void SMSWriter<val_t,coord_t>::close()
 // ---- FilterProgram ----
 
 FilterProgram::FilterProgram()
-  : name(), version(VERSION), description(),
+  : description(),
     input_(std::cin), output_(std::cout),
     options_(), optstring_(),
     notation_(DEFAULT_NOTATION), precision_(-1)
@@ -385,10 +378,10 @@ FilterProgram::FilterProgram()
   options_.push_back(opt0);
 
   // common options
-  add_option('h', "help",    no_argument, "Print this help text.");
+  add_option('h', "help",    no_argument, "Print help text.");
   add_option('V', "version", no_argument, "Print version string.");
-  add_option('i', "input",   required_argument, "Read input matrix from this file.");
-  add_option('o', "output",  required_argument, "Write output matrix to this file.");
+  add_option('i', "input",   required_argument, "Read input matrix from file ARG.");
+  add_option('o', "output",  required_argument, "Write output matrix to file ARG.");
   add_option('p', "precision", required_argument, "Set number of significant digits for printing matrix entry values.");
   add_option('E', "scientific", no_argument, "Output matrix entry values using scientifc notation.");
   add_option('F', "fixed",   no_argument, "Output matrix entry values using fixed notation.");
@@ -479,115 +472,139 @@ FilterProgram::main(int argc, char** argv)
     return 1;
   };
 
-  int c;
+  // program name is basename of argv[0]
+  std::string invocation(argv[0]);
+  std::size_t pos = invocation.rfind('/');
+  std::string name;
+  if (0 == pos)
+    name = invocation;
+  else 
+    name = invocation.substr(pos+1);
+  
   try {
-    while (true) {
-      c = getopt_long(argc, argv, optstring_.c_str(),
-                      &(options_[0]), NULL);
-      if (-1 == c)
-        break;
-      else if ('h' == c) {
-        std::cout << "Usage: " << name << "[options] [INPUT [OUTPUT]]" << std::endl;
-        std::cout << std::endl;
-        std::cout << description << std::endl;
-        std::cout << "Options:" << std::endl;
-        for (std::vector<struct option>::const_iterator it = options_.begin();
-             it != options_.end() - 1;
-             ++it)
-          {
-            std::ostringstream optname;
-            optname << "-" << static_cast<char>(it->val)
-                    << ", --" << it->name;
-            if (required_argument == it->has_arg)
-              optname <<" ARG";
-            else if (optional_argument == it->has_arg)
-              optname << " [ARG]";
+    // parse command-line arguments
+    int c;
+    try {
+      while (true) {
+        c = getopt_long(argc, argv, optstring_.c_str(),
+                        &(options_[0]), NULL);
+        if (-1 == c)
+          break;
+        else if ('h' == c) {
+          std::cout << "Usage: " << name << " [options] [INPUT [OUTPUT]]" << std::endl;
+          std::cout << std::endl;
+          std::cout << description << std::endl;
+          std::cout << "Options:" << std::endl;
+          for (std::vector<struct option>::const_iterator it = options_.begin();
+               it != options_.end() - 1;
+               ++it)
+            {
+              std::ostringstream optname;
+              optname << "-" << static_cast<char>(it->val)
+                      << ", --" << it->name;
+              if (required_argument == it->has_arg)
+                optname <<" ARG";
+              else if (optional_argument == it->has_arg)
+                optname << " [ARG]";
 
-            std::cout <<" "<< std::setw(24) 
-                      << std::setiosflags(std::ios::left) 
-                      << optname.str();
-            if (option_help_.find(it->val) != option_help_.end())
-              std::cout << option_help_[it->val];
-            std::cout << std::endl;
-          };
-        std::cout << std::endl;
-        return 0;
-      }
-      else if ('V' == c) {
-        std::cout << name <<" "<< version << std::endl;
-        return 0;
-      }
-      else if ('i' == c) {
-        set_input(optarg);
-      }
-      else if ('o' == c) {
-        set_output(optarg);
-      }
-      else if ('p' == c) {
-        std::istringstream(optarg) >> precision_;
-      }
-      else if ('E' == c) {
-        notation_ = DEFAULT_NOTATION;
-      }
-      else if ('F' == c) {
-        notation_ = FIXED_NOTATION;
-      }
-      else if ('G' == c) {
-        notation_ = DEFAULT_NOTATION;
-      }
-      else if ('?' == c) {
-        std::cerr << "Unknown option; type '" << argv[0] << " --help' to get usage help."
-                  << std::endl;
-        return 1;
-      }
-      else {
-        process_option(c, optarg);
-      };
-    }; // while(true)
-  }
-  catch(std::exception& ex) {
-    std::cerr << "Error in option '-" << static_cast<char>(c) << "': " << ex.what()
-              << " Type '" << argv[0] << " --help' to get usage help."
-              << std::endl;
-    return 1;
-  };
-  // all option processing done, now parse positional arguments
+              std::cout <<" "<< std::setw(24) 
+                        << std::setiosflags(std::ios::left) 
+                        << optname.str();
+              if (option_help_.find(it->val) != option_help_.end())
+                std::cout << option_help_[it->val];
+              std::cout << std::endl;
+            };
+          std::cout << std::endl;
+          return 0;
+        }
+        else if ('V' == c) {
+          // output conforms to GNU Coding Standards, but is kind of
+          // overkill for such a small utility package...
+          std::cout << name <<"(" PACKAGE_NAME ")" << PACKAGE_VERSION << std::endl;
+          std::cout << 
+            "\n"
+            "Copyright (C) 2010 Riccardo Murri <riccardo.murri@gmail.com>.\n"
+            "\n"
+            "License GPLv3+: GNU GPL version 3 or later; see http://gnu.org/licenses/gpl.html\n"
+            "This is free software: you are free to change and redistribute it.\n"
+            "There is NO WARRANTY, to the extent permitted by law.\n"
+            "\n"
+            "See " PACKAGE_URL " for more information.\n"
+                    << std::endl;
+          return 0;
+        }
+        else if ('i' == c) {
+          set_input(optarg);
+        }
+        else if ('o' == c) {
+          set_output(optarg);
+        }
+        else if ('p' == c) {
+          std::istringstream(optarg) >> precision_;
+        }
+        else if ('E' == c) {
+          notation_ = DEFAULT_NOTATION;
+        }
+        else if ('F' == c) {
+          notation_ = FIXED_NOTATION;
+        }
+        else if ('G' == c) {
+          notation_ = DEFAULT_NOTATION;
+        }
+        else if ('?' == c) {
+          std::cerr << "Unknown option; type '" << argv[0] << " --help' to get usage help."
+                    << std::endl;
+          return 1;
+        }
+        else {
+          process_option(c, optarg);
+        };
+      }; // while(true)
+    }
+    catch(std::exception& ex) {
+      std::ostringstream msg;
+      msg << "Error in option '-" << static_cast<char>(c) << "': " << ex.what()
+          << " Type '" << argv[0] << " --help' to get usage help."
+          << std::endl;
+      throw std::runtime_error(msg.str());
+    };
+    // all option processing done, now parse positional arguments
 
-  // set INPUT, if any
-  if (argc > optind) {
-    set_input(argv[optind]);
-    ++optind;
-  };
+    // set INPUT, if any
+    if (argc > optind) {
+      set_input(argv[optind]);
+      ++optind;
+    };
 
-  // set OUTPUT, if any
-  if (argc > optind) {
-    set_output(argv[optind]);
-    ++optind;
-  };
+    // set OUTPUT, if any
+    if (argc > optind) {
+      set_output(argv[optind]);
+      ++optind;
+    };
 
-  // too many arguments
-  if (argc > optind) {
-    std::cerr << "At most two positional arguments allowed."
-              << " Type '" << argv[0] << " --help' to get usage help."
-              << std::endl;
-    return 1;
-  }
+    // too many arguments
+    if (argc > optind) {
+      std::ostringstream msg;
+      msg << "At most two positional arguments allowed."
+          << " Type '" << argv[0] << " --help' to get usage help."
+          << std::endl;
+      throw std::runtime_error(msg.str());
+    }
 
-  // set output format
-  switch(notation_) {
-  case DEFAULT_NOTATION:    output_->unsetf(std::ios_base::floatfield); break;
-  case FIXED_NOTATION:      output_->setf(std::ios_base::fixed); break;
-  case SCIENTIFIC_NOTATION: output_->setf(std::ios_base::scientific); break;
-  };
-  if (precision_ >= 0)
-    output_->precision(precision_);
+    // set output format
+    switch(notation_) {
+    case DEFAULT_NOTATION:    output_->unsetf(std::ios_base::floatfield); break;
+    case FIXED_NOTATION:      output_->setf(std::ios_base::fixed); break;
+    case SCIENTIFIC_NOTATION: output_->setf(std::ios_base::scientific); break;
+    };
+    if (precision_ >= 0)
+      output_->precision(precision_);
 
-  // now do stuff
-  try {
+    // now do stuff
     return this->run();
   }
   catch (std::runtime_error& ex) {
-    std::cerr << argv[0] << ": ERROR: " << ex.what() << std::endl;
+    std::cerr << name << ": ERROR: " << ex.what() << std::endl;
     return 1;
   };
 };
