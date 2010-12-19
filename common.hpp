@@ -583,7 +583,13 @@ FilterProgram::main(int argc, char** argv)
     output_->precision(precision_);
 
   // now do stuff
-  this->run();
+  try {
+    return this->run();
+  }
+  catch (std::runtime_error& ex) {
+    std::cerr << argv[0] << ": ERROR: " << ex.what() << std::endl;
+    return 1;
+  };
 };
 
 
