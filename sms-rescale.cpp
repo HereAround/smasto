@@ -1,7 +1,7 @@
 /**
  * @file   sms-copy.cpp
  *
- * Copy a matrix stream, optionally applying a transformation to the values.
+ * Copy a matrix stream, optionally rescaling the values by a constant factor.
  *
  * @author  riccardo.murri@gmail.com
  * @version $Revision$
@@ -45,16 +45,16 @@ typedef double val_t;
 # endif 
 
 
-class CopyProgram : public FilterProgram, 
-                    public SMSReader<val_t>, 
-                    public SMSWriter<val_t>
+class RescaleProgram : public FilterProgram, 
+                       public SMSReader<val_t>, 
+                       public SMSWriter<val_t>
 {
 public:
-  CopyProgram() 
+  RescaleProgram() 
     : multiply_(1), divide_(1)
   {
-    this->add_option('m', "multiply",  required_argument, "Multiply each entry by ARG.");
-    this->add_option('r', "rescale",   required_argument, "Divide each entry by ARG.");
+    this->add_option('m', "multiply", required_argument, "Multiply each entry by ARG.");
+    this->add_option('r', "divide",   required_argument, "Divide each entry by ARG.");
     this->description = 
       "Output a copy of the matrix given in the INPUT stream,\n"
       "optionally multiplying each entry by a constant factor.\n"
@@ -96,5 +96,5 @@ private:
 
 int main(int argc, char** argv)
 {
-  return CopyProgram().main(argc, argv);
+  return RescaleProgram().main(argc, argv);
 };
