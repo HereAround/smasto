@@ -1,11 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sms-copy sms-info sms-norm sms-transpose
+bin_PROGRAMS = sms-copy sms-info sms-norm sms-randminor sms-transpose
 
 
 sms_copy_SOURCES = sms-copy.cpp
 sms_info_SOURCES = sms-info.cpp
 sms_norm_SOURCES = sms-norm.cpp
+sms_randminor_SOURCES = sms-randminor.cpp
 sms_transpose_SOURCES = sms-transpose.cpp
 
 
