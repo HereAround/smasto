@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010 riccardo.murri@gmail.com.  All rights reserved.
+ * Copyright (c) 2010, 2011 riccardo.murri@gmail.com.  All rights reserved.
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,8 +50,9 @@ class InfoProgram : public FilterProgram,
 {
 public:
   InfoProgram() 
-    : nnz_(0)
+    : nnz_(0), short_(false)
   {
+    this->add_option('s', "short",  no_argument, "One-line output format");
     this->description = 
       "Output information on the matrix given in the INPUT stream:\n"
       "number of rows and columns, number of nonzero values, density.\n"
@@ -60,7 +61,8 @@ public:
 
   void process_option(const int opt, const char* argument)
   {
-    // need to have one
+    if ('s' == opt)
+      short_ = true;
   };
 
   int run() { 
@@ -70,11 +72,18 @@ public:
     read();
     SMSReader<val_t>::close();
 
-    (*output_) << "Rows: " << nrows << std::endl;
-    (*output_) << "Columns: " << ncols << std::endl;
-    (*output_) << "Non-zeros: " << nnz_ << std::endl;
-    (*output_) << "Density%: " << (100.0 * nnz_ / nrows / ncols) << std::endl;
-    
+    if (short_) {
+      (*output_) << "rows:" << nrows 
+                 << " columns:" << ncols 
+                 << " nonzero:" << nnz_ 
+                 << " density:" << (100.0 * nnz_ / nrows / ncols) << std::endl;
+    }
+    else {
+      (*output_) << "Rows: " << nrows << std::endl;
+      (*output_) << "Columns: " << ncols << std::endl;
+      (*output_) << "Non-zeros: " << nnz_ << std::endl;
+      (*output_) << "Density%: " << (100.0 * nnz_ / nrows / ncols) << std::endl;
+    };
     return 0; 
   };
 
@@ -87,6 +96,7 @@ public:
 
 private:
   coord_t nnz_;
+  bool short_;
 };
 
 
