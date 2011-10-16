@@ -38,6 +38,11 @@ dnl     ])
 AC_CHECK_FUNCS([sqrt strdup strerror])
 
 
+# check for needed Boost libraries 
+BOOST_REQUIRE([1.15]) # Boost.Random introduced in 1.15.0
+BOOST_RANDOM
+
+
 # Final output
 AC_LANG_POP([C++])
 AC_CONFIG_FILES([Makefile])

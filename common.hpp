@@ -602,10 +602,10 @@ FilterProgram::main(int argc, char** argv)
     // all option processing done, now parse positional arguments
     if (optind > 0)
       argv[optind-1] = argv[0];
-    this->parse_args(argc - (optind-1), &(argv[optind-1]));
+    parse_args(argc - (optind-1), &(argv[optind-1]));
 
     // now do stuff
-    return this->run();
+    return run();
   }
   catch (std::runtime_error& ex) {
     std::cerr << name << ": ERROR: " << ex.what() << std::endl;
