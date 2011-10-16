@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010 riccardo.murri@gmail.com. All rights reserved.
+ * Copyright (c) 2010, 2011 riccardo.murri@gmail.com. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -182,6 +182,13 @@ public:
       to the user as an error. */
   virtual void process_option(const int short_name, const char* argument) = 0;
 
+  /** Parse positional argument.  Called with what remains of the
+      command-line arguments, after options and their arguments have
+      been removed; `argc` is updated accordingly.  The default
+      implementation looks for (optional) INPUT and OUTPUT arguments
+      and sets the input and output streams based on that. */
+  virtual void parse_args(int argc, char** argv);
+
   /** Process stream and return program exitcode.  When this is
       called, the instance members @c input_ and @c output_ are
       connected to the input and output streams as set from the
@@ -190,6 +197,15 @@ public:
 
   /** Run filter program with command-line arguments. Return UNIX exit code. */
   int main(int argc, char** argv);
+
+  // XXX: this should be migrated to SMSWriter!
+  /** How to write matrix entries to the output stream. */
+  typedef enum { DEFAULT_NOTATION, FIXED_NOTATION, SCIENTIFIC_NOTATION } entry_format;
+
+  /** Use the specified format and precision for writing matrix
+      entries to the output stream.  If this is never called, the std
+      C++ formats apply. */
+  void set_output_format(entry_format notation, const int precision);
 
 protected:
   std::vector<struct option> options_;
@@ -202,7 +218,7 @@ protected:
   pointer<std::ostream> output_;
   void set_output(const std::string& filename);
 
-  enum { DEFAULT_NOTATION, FIXED_NOTATION, SCIENTIFIC_NOTATION } notation_;
+  entry_format notation_;
   int precision_;
 };
 
@@ -464,6 +480,20 @@ FilterProgram::set_output(const std::string& filename)
 };
 
 
+void 
+FilterProgram::set_output_format(entry_format notation, const int precision)
+{
+  // set output format
+  switch(notation) {
+  case DEFAULT_NOTATION:    output_->unsetf(std::ios_base::floatfield); break;
+  case FIXED_NOTATION:      output_->setf(std::ios_base::fixed); break;
+  case SCIENTIFIC_NOTATION: output_->setf(std::ios_base::scientific); break;
+  };
+  if (precision >= 0)
+    output_->precision(precision);
+};
+
+
 int
 FilterProgram::main(int argc, char** argv)
 {
@@ -568,37 +598,11 @@ FilterProgram::main(int argc, char** argv)
           << std::endl;
       throw std::runtime_error(msg.str());
     };
+
     // all option processing done, now parse positional arguments
-
-    // set INPUT, if any
-    if (argc > optind) {
-      set_input(argv[optind]);
-      ++optind;
-    };
-
-    // set OUTPUT, if any
-    if (argc > optind) {
-      set_output(argv[optind]);
-      ++optind;
-    };
-
-    // too many arguments
-    if (argc > optind) {
-      std::ostringstream msg;
-      msg << "At most two positional arguments allowed."
-          << " Type '" << argv[0] << " --help' to get usage help."
-          << std::endl;
-      throw std::runtime_error(msg.str());
-    }
-
-    // set output format
-    switch(notation_) {
-    case DEFAULT_NOTATION:    output_->unsetf(std::ios_base::floatfield); break;
-    case FIXED_NOTATION:      output_->setf(std::ios_base::fixed); break;
-    case SCIENTIFIC_NOTATION: output_->setf(std::ios_base::scientific); break;
-    };
-    if (precision_ >= 0)
-      output_->precision(precision_);
+    if (optind > 0)
+      argv[optind-1] = argv[0];
+    this->parse_args(argc - (optind-1), &(argv[optind-1]));
 
     // now do stuff
     return this->run();
@@ -606,6 +610,31 @@ FilterProgram::main(int argc, char** argv)
   catch (std::runtime_error& ex) {
     std::cerr << name << ": ERROR: " << ex.what() << std::endl;
     return 1;
+  };
+};
+
+
+void
+FilterProgram::parse_args(int argc, char** argv)
+{
+  // set INPUT, if any
+  if (argc > 1) {
+    set_input(argv[1]);
+  };
+  
+  // set OUTPUT, if any
+  if (argc > 2) {
+    set_output(argv[2]);
+  };
+  set_output_format(notation_, precision_);
+  
+  // too many arguments
+  if (argc > 3) {
+    std::ostringstream msg;
+    msg << "At most two positional arguments allowed."
+        << " Type '" << argv[0] << " --help' to get usage help."
+        << std::endl;
+    throw std::runtime_error(msg.str());
   };
 };
 
