@@ -1,5 +1,5 @@
 /**
- * @file   sms-reord.cpp
+ * @file   sms-reordrows.cpp
  *
  * Permute rows and columns of the input matrix, in order to minimize
  * computation time of the rank by Gaussian Elimination algorithms.
