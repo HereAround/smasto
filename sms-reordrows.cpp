@@ -8,7 +8,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010 riccardo.murri@gmail.com.  All rights reserved.
+ * Copyright (c) 2010, 2011 riccardo.murri@gmail.com.  All rights reserved.
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,12 +48,12 @@ typedef double val_t;
 # endif 
 
 
-class ReordProgram : public FilterProgram, 
+class ReordRowsProgram : public FilterProgram, 
                          public SMSReader<val_t>,
                          public SMSWriter<val_t>
 {
 public:
-  ReordProgram() 
+  ReordRowsProgram() 
     : m(), r(), c(),
       a_(4.5), b_(2.0), c_(1.0), d_(2.0), e_(0.5)
   {
@@ -138,7 +138,7 @@ public:
       coord_t chosen_j = -1; // invalid index, initially
       double badness = 1000.0; // max. attainable weight
       for (coord_t ii = i; ii <= nrows; ++ii) {
-        // a. ignore zero rows
+        // 0. ignore zero rows
         if (0 == r[ii])
           continue;
 
@@ -156,7 +156,7 @@ public:
               j = jj->first;
               cj = c[jj->first];
             };
-        };
+        }; // end for(jj = m[ii].begin(); ...)
 
         coord_t c1 = 0;
         coord_t c2 = 0;
@@ -261,5 +261,5 @@ private:
 
 int main(int argc, char** argv)
 {
-  return ReordProgram().main(argc, argv);
+  return ReordRowsProgram().main(argc, argv);
 };
