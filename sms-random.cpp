@@ -138,7 +138,7 @@ public:
           continue;
 
         // output entry
-        write_entry(i, j, value);
+        write_entry(i+1, j+1, value);
       }
     SMSWriter<val_t>::close();
 
