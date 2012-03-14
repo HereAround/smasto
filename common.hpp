@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010, 2011 riccardo.murri@gmail.com. All rights reserved.
+ * Copyright (c) 2010-2012 riccardo.murri@gmail.com. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -553,7 +553,7 @@ FilterProgram::main(int argc, char** argv)
           std::cout << name <<"(" PACKAGE_NAME ")" << PACKAGE_VERSION << std::endl;
           std::cout << 
             "\n"
-            "Copyright (C) 2010 Riccardo Murri <riccardo.murri@gmail.com>.\n"
+            "Copyright (C) 2010-2012 Riccardo Murri <riccardo.murri@gmail.com>.\n"
             "\n"
             "License GPLv3+: GNU GPL version 3 or later; see http://gnu.org/licenses/gpl.html\n"
             "This is free software: you are free to change and redistribute it.\n"
