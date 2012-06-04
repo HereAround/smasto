@@ -138,12 +138,12 @@ public:
 
   /** Output a single matrix entry to the currently-open output stream. */
   void write_entry(const coord_t row, const coord_t col, const val_t& value);
-  
+
   /** Finish writing matrix entries to the given stream.  Output
       end-of-data marker and close stream if necessary. */
   void close();
 
-protected: 
+protected:
   pointer<std::ostream> output_;
 };
 
@@ -168,7 +168,7 @@ public:
   /** Define a new option to be processed.  The @p short_name
       parameter must be a printable character; @p long_name has to be
       a nonempty string. */
-  void add_option(const char short_name, const std::string& long_name, 
+  void add_option(const char short_name, const std::string& long_name,
                   int has_arg, const std::string& description);
 
   /** Called when an option defined with @ref add_option has been
@@ -228,10 +228,55 @@ protected:
 // implementation
 //
 
+template< typename val_t >
+bool is_zero(const val_t& value)
+{
+  return (0 == value);
+};
+
+template<>
+bool is_zero< typename std::string >(const std::string& value)
+{
+  static const std::string exponent_sep("eEfFgG");
+
+  // shortcuts
+  if ("0" == value or "0.0" == value)
+    return true;
+  // else, examine string to see if it matches any sensible
+  // representation of "0"
+  std::string::const_iterator c = value.begin();
+  // skip leading whitespace
+  while (std::isspace(*c)) ++c;
+  // ignore optional sign
+  if ('-' == *c or '+' == *c) ++c;
+  // any number of zeroes is OK
+  while ('0' == *c) ++c;
+  if (value.end() == c)
+    return true;
+  // if string continues, zeroes must be followed by a decimal dot '.'
+  // or a rational slash '/' or the exponent of a scientific notation number
+  if ('/' == *c)
+    // rational number: it is zero because the denominator is zero
+    return true;
+  else if (exponent_sep.find(*c) != std::string::npos)
+    // sci notation: zero because the mantissa is zero
+    return true;
+  else if ('.' == *c) {
+    // more zeroes to follow
+    while ('0' == *c) ++c;
+    return (value.end() == c
+            or '/' == *c
+            or exponent_sep.find(*c) != std::string::npos);
+  }
+  else
+    return false;
+};
+
+
 // ---- SMSReader ----
 
 template< typename val_t, typename coord_t >
-SMSReader<val_t,coord_t>::SMSReader() 
+SMSReader<val_t,coord_t>::SMSReader()
   : input_() , nrows_(0), ncols_(0)
 {
   // nothing to do
@@ -246,8 +291,8 @@ SMSReader<val_t,coord_t>::~SMSReader()
 
 
 template< typename val_t, typename coord_t >
-void SMSReader<val_t,coord_t>::open(std::istream& input) 
-{ 
+void SMSReader<val_t,coord_t>::open(std::istream& input)
+{
   input_ = input;
   char M;
   (*input_) >> std::skipws >> nrows_ >> ncols_ >> M;
@@ -256,13 +301,13 @@ void SMSReader<val_t,coord_t>::open(std::istream& input)
 };
 
 template< typename val_t, typename coord_t >
-void SMSReader<val_t,coord_t>::open(const std::string& filename) 
-{ 
+void SMSReader<val_t,coord_t>::open(const std::string& filename)
+{
   errno = 0;
-  std::ifstream input(filename); 
-  if (input.good()) 
-    input_ = input; 
-  else { 
+  std::ifstream input(filename);
+  if (input.good())
+    input_ = input;
+  else {
     std::ostringstream msg;
     msg << "Cannot open file '" << filename << "': " << strerror(errno);
     throw std::runtime_error(msg.str());
@@ -282,13 +327,13 @@ template< typename val_t, typename coord_t >
 void SMSReader<val_t,coord_t>::read()
 {
   while (not (*input_).eof()) {
-    coord_t i, j; 
-    double value;
+    coord_t i, j;
+    val_t value;
     (*input_) >> i >> j >> value;
     assert(0 <= i and i <= nrows_);
     assert(0 <= j and j <= ncols_);
     // '0 0 0' is the end-of-stream marker
-    if (0 == i and 0 == j and 0 == value) {
+    if (0 == i and 0 == j and is_zero(value)) {
       this->done();
       break;
     };
@@ -299,7 +344,7 @@ void SMSReader<val_t,coord_t>::read()
 
 
 template< typename val_t, typename coord_t >
-void SMSReader<val_t,coord_t>::close() 
+void SMSReader<val_t,coord_t>::close()
 {
   input_.release();
 };
@@ -324,9 +369,9 @@ SMSWriter<val_t,coord_t>::~SMSWriter()
 
 
 template< typename val_t, typename coord_t >
-void SMSWriter<val_t,coord_t>::open(std::ostream& output, 
-                                    const coord_t nrows, const coord_t ncols) 
-{ 
+void SMSWriter<val_t,coord_t>::open(std::ostream& output,
+                                    const coord_t nrows, const coord_t ncols)
+{
   output_ = output;
   (*output_) << nrows <<" "<< ncols <<" M"<< std::endl;
   if (output_->bad())
@@ -335,14 +380,14 @@ void SMSWriter<val_t,coord_t>::open(std::ostream& output,
 
 
 template< typename val_t, typename coord_t >
-void SMSWriter<val_t,coord_t>::open(const std::string& filename, 
-                                    const coord_t nrows, const coord_t ncols) 
-{ 
+void SMSWriter<val_t,coord_t>::open(const std::string& filename,
+                                    const coord_t nrows, const coord_t ncols)
+{
   errno = 0;
-  std::ofstream output(filename); 
-  if (output.good()) 
-    output_ = output; 
-  else { 
+  std::ofstream output(filename);
+  if (output.good())
+    output_ = output;
+  else {
     std::ostringstream msg;
     msg << "Cannot open file '" << filename << "' for writing: " << strerror(errno);
     throw std::runtime_error(msg.str());
@@ -350,7 +395,7 @@ void SMSWriter<val_t,coord_t>::open(const std::string& filename,
 
   errno = 0;
   (*output_) << nrows <<" "<< ncols <<" M"<< std::endl;
-  if (output_->bad()) { 
+  if (output_->bad()) {
     std::ostringstream msg;
     msg << "Error writing to file '" << filename << "': " << strerror(errno);
     throw std::runtime_error(msg.str());
@@ -359,7 +404,7 @@ void SMSWriter<val_t,coord_t>::open(const std::string& filename,
 
 
 template< typename val_t, typename coord_t >
-void SMSWriter<val_t,coord_t>::write_entry(const coord_t row, const coord_t col, 
+void SMSWriter<val_t,coord_t>::write_entry(const coord_t row, const coord_t col,
                                            const val_t& value)
 {
   (*output_) << row <<" "<< col <<" "<< value << std::endl;
@@ -413,7 +458,7 @@ FilterProgram::~FilterProgram()
              ++it)
           {
             free(const_cast<char*>(it->name));
-          };  
+          };
 };
 
 
@@ -442,7 +487,7 @@ FilterProgram::add_option(const char short_name,
 };
 
 
-void 
+void
 FilterProgram::set_input(const std::string& filename)
 {
   if (filename == "-") {
@@ -453,7 +498,7 @@ FilterProgram::set_input(const std::string& filename)
   std::ifstream* input = new std::ifstream(filename.c_str());
   if (not input->good()) {
     std::ostringstream msg;
-    msg << "Cannot open input file '" << filename << "': " 
+    msg << "Cannot open input file '" << filename << "': "
         << strerror(errno) << ".";
     throw std::runtime_error(msg.str());
   };
@@ -461,7 +506,7 @@ FilterProgram::set_input(const std::string& filename)
 };
 
 
-void 
+void
 FilterProgram::set_output(const std::string& filename)
 {
   if (filename == "-") {
@@ -472,7 +517,7 @@ FilterProgram::set_output(const std::string& filename)
   std::ofstream* output = new std::ofstream(filename.c_str());
   if (not output->good()) {
     std::ostringstream msg;
-    msg << "Cannot open output file '" << filename << "': " 
+    msg << "Cannot open output file '" << filename << "': "
         << strerror(errno) << ".";
     throw std::runtime_error(msg.str());
   };
@@ -480,7 +525,7 @@ FilterProgram::set_output(const std::string& filename)
 };
 
 
-void 
+void
 FilterProgram::set_output_format(entry_format notation, const int precision)
 {
   // set output format
@@ -508,9 +553,9 @@ FilterProgram::main(int argc, char** argv)
   std::string name;
   if (0 == pos)
     name = invocation;
-  else 
+  else
     name = invocation.substr(pos+1);
-  
+
   try {
     // parse command-line arguments
     int c;
@@ -537,8 +582,8 @@ FilterProgram::main(int argc, char** argv)
               else if (optional_argument == it->has_arg)
                 optname << " [ARG]";
 
-              std::cout <<" "<< std::setw(24) 
-                        << std::setiosflags(std::ios::left) 
+              std::cout <<" "<< std::setw(24)
+                        << std::setiosflags(std::ios::left)
                         << optname.str();
               if (option_help_.find(it->val) != option_help_.end())
                 std::cout << option_help_[it->val];
@@ -551,7 +596,7 @@ FilterProgram::main(int argc, char** argv)
           // output conforms to GNU Coding Standards, but is kind of
           // overkill for such a small utility package...
           std::cout << name <<"(" PACKAGE_NAME ")" << PACKAGE_VERSION << std::endl;
-          std::cout << 
+          std::cout <<
             "\n"
             "Copyright (C) 2010-2012 Riccardo Murri <riccardo.murri@gmail.com>.\n"
             "\n"
@@ -621,13 +666,13 @@ FilterProgram::parse_args(int argc, char** argv)
   if (argc > 1) {
     set_input(argv[1]);
   };
-  
+
   // set OUTPUT, if any
   if (argc > 2) {
     set_output(argv[2]);
   };
   set_output_format(notation_, precision_);
-  
+
   // too many arguments
   if (argc > 3) {
     std::ostringstream msg;

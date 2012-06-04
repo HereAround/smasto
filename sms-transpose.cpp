@@ -39,31 +39,27 @@
 // matrix dimensions should fit into a `long` integer type
 typedef long coord_t;
 
-// always select the widest floating-point type available
-# ifdef HAVE_LONG_DOUBLE
-typedef long double val_t;
-# else
-typedef double val_t;
-# endif 
+// transposing does not care about the type of the entries
+typedef std::string val_t;
 
 
-class TransposeProgram : public FilterProgram, 
-                    public SMSReader<val_t>, 
+class TransposeProgram : public FilterProgram,
+                    public SMSReader<val_t>,
                     public SMSWriter<val_t>
 {
 public:
-  TransposeProgram() 
+  TransposeProgram()
     : m(), tall_(false), wide_(false), transpose_(true)
   {
     this->add_option('C', "wide", no_argument, "Only transpose if the output matrix has more columns than rows.");
     this->add_option('R', "tall", no_argument, "Only transpose if the output matrix has more rows than columns.");
-    this->description = 
+    this->description =
       "Output the transpose of the INPUT stream matrix.\n"
       "If the '-R' or '-C' options are given, the OUTPUT\n"
       "matrix is a transpose of INPUT only if it matches\n"
       "the requested condition; it is an exact copy otherwise.\n"
       "\n"
-      "Both the INPUT and the OUTPUT matrix streams are in J.-G.\n" 
+      "Both the INPUT and the OUTPUT matrix streams are in J.-G.\n"
       "Dumas' SMS format.\n"
       ;
   };
@@ -76,7 +72,7 @@ public:
       tall_ = true;
   };
 
-  int run() { 
+  int run() {
     if (tall_ and wide_)
       throw std::runtime_error("Only one of the options '-R' and '-C' can be specified at a time.");
 
@@ -92,7 +88,7 @@ public:
     if (transpose_)
       std::swap(nrows, ncols);
     SMSWriter<val_t>::open(*FilterProgram::output_, nrows, ncols);
-                           
+
     read();
 
     for(matrix_t::const_iterator r = m.begin(); r != m.end(); ++r)
@@ -101,7 +97,7 @@ public:
 
     SMSWriter<val_t>::close();
     SMSReader<val_t>::close();
-    return 0; 
+    return 0;
   };
 
   void process_entry(const coord_t i, const coord_t j, const val_t& value)

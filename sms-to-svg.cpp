@@ -37,19 +37,15 @@
 // matrix dimensions should fit into a `long` integer type
 typedef long coord_t;
 
-// always select the widest floating-point type available
-# ifdef HAVE_LONG_DOUBLE
-typedef long double val_t;
-# else
-typedef double val_t;
-# endif 
+// do not care about the type of the entries, just check if they are zero/nonzero
+typedef std::string val_t;
 
 
-class SvgProgram : public FilterProgram, 
+class SvgProgram : public FilterProgram,
                    public SMSReader<val_t>
 {
 public:
-  SvgProgram() 
+  SvgProgram()
     : size_(5)
     , ticks_(120)
     , entry_color_("blue")
@@ -61,18 +57,18 @@ public:
     this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries (default 120); disable if NUM is 0.");
     this->add_option('j', "grid-color",  required_argument, "Color of the grid axes (if any).");
     this->add_option('k', "frame-color", required_argument, "Color of the enclosing box.");
-    this->description = 
+    this->description =
       "Write to OUTPUT a representation of the nonzero pattern of the INPUT matrix.\n"
       ;
   };
 
   void process_option(const int opt, const char* argument)
   {
-    if ('b' == opt) 
+    if ('b' == opt)
       std::istringstream(argument) >> size_;
     else if ('c' == opt)
       entry_color_ = argument;
-    else if ('g' == opt) 
+    else if ('g' == opt)
       std::istringstream(argument) >> ticks_;
     else if ('j' == opt)
       grid_color_ = argument;
@@ -80,9 +76,9 @@ public:
       frame_color_ = argument;
   };
 
-  int run() { 
+  int run() {
     // write SVG header
-    (*output_) 
+    (*output_)
       << "<?xml version=\"1.0\" standalone=\"no\"?>\n"
       << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"
       << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">\n"
@@ -99,22 +95,22 @@ public:
     // draw frame around matrix
     coord_t nrows = SMSReader<val_t>::rows();
     coord_t ncols = SMSReader<val_t>::columns();
-    (*output_) 
+    (*output_)
       << "<rect class=\"MatrixFrame\" x=\"0\" y=\"0\""
-      << " height=\"" << (size_ * nrows) << "\"" 
-      << " width=\"" << (size_ * ncols) << "\"" 
+      << " height=\"" << (size_ * nrows) << "\""
+      << " width=\"" << (size_ * ncols) << "\""
       << " />"
       << std::endl;
 
     // draw ticks marks
-    if (0 != ticks_) 
+    if (0 != ticks_)
       {
         ticks_ *= size_;
         int max_digits = (1 + floor(log10(std::max(nrows, ncols))));
         coord_t dy = (ticks_ / 3);
         coord_t pt = (ticks_ / (2 * max_digits));
         for (coord_t j = ticks_; j < ncols*size_; j += ticks_) {
-          (*output_) 
+          (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << j << "\""
             << " y1=\"" << 0 - dy << "\""
@@ -142,7 +138,7 @@ public:
             << std::endl;
         };
         for (coord_t i = ticks_; i < (nrows * size_); i += ticks_) {
-          (*output_) 
+          (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << 0 << "\""
             << " y1=\"" << i << "\""
@@ -177,17 +173,17 @@ public:
     // write closing XML elements
     (*output_)
       << "</g>\n"
-      << "</svg>\n" 
+      << "</svg>\n"
       << std::endl;
 
     SMSReader<val_t>::close();
-    return 0; 
+    return 0;
   };
 
   void process_entry(const coord_t i, const coord_t j, const val_t& value)
   {
-    if (0 != value)
-      (*output_) 
+    if (not is_zero(value))
+      (*output_)
         << "<rect class=\"MatrixEntry\""
         << " width=\"" << size_ << "\" height=\"" << size_ << "\""
         << " x=\"" << ((j-1)*size_) << "\""
