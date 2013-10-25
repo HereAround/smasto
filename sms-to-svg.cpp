@@ -122,10 +122,10 @@ public:
     coord_t ncols = SMSReader<val_t>::columns();
 
     if (0 != max_width_)
-      shrink_ = ncols / max_width_;
+      shrink_ = ncols / (max_width_ / size_);
 
     if (0 != max_height_)
-      shrink_ = nrows / max_height_;
+      shrink_ = nrows / (max_height_ / size_);
 
     if (xticks_ < 0) {
       const coord_t divs = -xticks_;
