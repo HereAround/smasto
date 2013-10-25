@@ -133,14 +133,15 @@ public:
       yticks_ = (nrows/divs);
     };
 
+    // vertical axes (x-ticks)
+    xticks_ *= size_;
+    yticks_ *= size_;
     int const max_digits = (1 + floor(log10(std::max(nrows, ncols))));
+    const coord_t pt = (std::min(xticks_, yticks_) / (2 * max_digits));
 
-    // draw vertical axes (x-ticks)
     if (0 != xticks_)
       {
-        xticks_ *= size_;
         const coord_t dy = (xticks_ / 3);
-        const coord_t pt = (xticks_ / (2 * max_digits));
         for (coord_t j = xticks_; j < ncols*size_; j += xticks_) {
           // vertical axis
           (*output_)
@@ -177,9 +178,7 @@ public:
     // draw horizontal axes (y-ticks)
     if (0 != yticks_)
       {
-        yticks_ *= size_;
         const coord_t dx = (yticks_ / 3);
-        const coord_t pt = (yticks_ / (2 * max_digits));
         for (coord_t i = yticks_; i < (nrows * size_); i += yticks_) {
           (*output_)
             << "<line class=\"MatrixSeparator\""
