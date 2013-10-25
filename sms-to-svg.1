@@ -13,11 +13,16 @@ Write to OUTPUT a representation of the nonzero pattern of the INPUT matrix.
 .HP
 \fB\-x\fR, \fB\-\-num\-vert\-axes\fR ARG Draw NUM vertical axes, equally spaced across the entire picture width. Disable if NUM is 0 (default). Mutually incompatible with `\-g`.
 .TP
-\fB\-k\fR, \fB\-\-frame\-color\fR ARG
-Color of the enclosing box.
+\fB\-w\fR, \fB\-\-shrink\-to\-width\fR ARGScale the output image so that the drawing area is at most NUM pixels wide.
+Mutually exclusive with options `\-s` and `\-T`.
+.HP
+\fB\-t\fR, \fB\-\-shrink\-to\-height\fR ARGScale the output image so that the drawing area is at most NUM pixels tall. Mutually exclusive with options `\-s` and `\-W`.
 .TP
 \fB\-s\fR, \fB\-\-shrink\fR ARG
-One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1\-1 to matrix entries.
+One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1\-1 to matrix entries.  Mutually exclusive with options `\-T` and `\-W`.
+.TP
+\fB\-k\fR, \fB\-\-frame\-color\fR ARG
+Color of the enclosing box.
 .TP
 \fB\-j\fR, \fB\-\-grid\-color\fR ARG
 Color of the grid axes (if any).

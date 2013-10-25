@@ -50,6 +50,8 @@ public:
   SvgProgram()
     : size_(5)
     , shrink_(1)
+    , max_width_(0)
+    , max_height_(0)
     , darken_(1.0)
     , m_()
     , xticks_(0)
@@ -63,8 +65,10 @@ public:
     this->add_option('d', "darken",       required_argument, "Overcount nonzero elements in matrix tiles; useful for very sparse matrices.  Requires a single argument BIAS, which is a floating point number (1.0 is the default and gives a faithful count of nonzeroes). This option has no effect when not shrinking (default, see the `-s` option).");
     this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries; disable if NUM is 0 (default). Mutually incompatible with `-e`");
     this->add_option('j', "grid-color",  required_argument, "Color of the grid axes (if any).");
-    this->add_option('s', "shrink",      required_argument, "One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1-1 to matrix entries.");
     this->add_option('k', "frame-color", required_argument, "Color of the enclosing box.");
+    this->add_option('s', "shrink",      required_argument, "One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1-1 to matrix entries.  Mutually exclusive with options `-T` and `-W`.");
+    this->add_option('t', "shrink-to-height", required_argument, "Scale the output image so that the drawing area is at most NUM pixels tall. Mutually exclusive with options `-s` and `-W`.");
+    this->add_option('w', "shrink-to-width", required_argument, "Scale the output image so that the drawing area is at most NUM pixels wide.  Mutually exclusive with options `-s` and `-T`.");
     this->add_option('x', "num-vert-axes",  required_argument, "Draw NUM vertical axes, equally spaced across the entire picture width. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->add_option('y', "num-horiz-axes", required_argument, "Draw NUM horizontal axes, equally spaced across the entire picture height. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->description =
@@ -90,6 +94,10 @@ public:
       frame_color_ = argument;
     else if ('s' == opt)
       std::istringstream(argument) >> shrink_;
+    else if ('t' == opt)
+      std::istringstream(argument) >> max_height_;
+    else if ('w' == opt)
+      std::istringstream(argument) >> max_width_;
     else if ('x' == opt) {
       // a negative value for `xticks_` is interpreted as a request to
       // create that many equally-spaced axes
@@ -105,6 +113,30 @@ public:
   };
 
   int run() {
+    // open INPUT file early, so we can detect format errors and abort
+    // before printing anything to the output
+    SMSReader<val_t>::open(*FilterProgram::input_);
+
+    // size computations for options -t, -w, -x, -y
+    coord_t nrows = SMSReader<val_t>::rows();
+    coord_t ncols = SMSReader<val_t>::columns();
+
+    if (0 != max_width_)
+      shrink_ = ncols / max_width_;
+
+    if (0 != max_height_)
+      shrink_ = nrows / max_height_;
+
+    if (xticks_ < 0) {
+      const coord_t divs = -xticks_;
+      xticks_ = (ncols/shrink_/divs);
+    };
+
+    if (yticks_ < 0) {
+      const coord_t divs = -yticks_;
+      yticks_ = (nrows/shrink_/divs);
+    };
+
     // write SVG header
     (*output_)
       << "<?xml version=\"1.0\" standalone=\"no\"?>\n"
@@ -118,12 +150,7 @@ public:
       << "<g>\n"
       << std::endl;
 
-
-    SMSReader<val_t>::open(*FilterProgram::input_);
-
     // draw frame around matrix
-    coord_t nrows = SMSReader<val_t>::rows();
-    coord_t ncols = SMSReader<val_t>::columns();
     (*output_)
       << "<rect class=\"MatrixFrame\" x=\"0\" y=\"0\""
       << " height=\"" << (size_ * nrows / shrink_) << "\""
@@ -133,16 +160,6 @@ public:
 
     // draw ticks marks
     //
-
-    if (xticks_ < 0) {
-      const coord_t divs = -xticks_;
-      xticks_ = (ncols/shrink_/divs);
-    };
-
-    if (yticks_ < 0) {
-      const coord_t divs = -yticks_;
-      yticks_ = (nrows/shrink_/divs);
-    };
 
     // vertical axes (x-ticks)
     xticks_ *= size_;
@@ -256,6 +273,8 @@ public:
 private:
   coord_t      size_;
   coord_t      shrink_;
+  coord_t      max_width_;
+  coord_t      max_height_;
   double       darken_;
   coord_t      xticks_;
   coord_t      yticks_;
