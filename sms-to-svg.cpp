@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <sstream>
 
 
@@ -48,6 +49,9 @@ class SvgProgram : public FilterProgram,
 public:
   SvgProgram()
     : size_(5)
+    , shrink_(1)
+    , darken_(1.0)
+    , m_()
     , xticks_(0)
     , yticks_(0)
     , entry_color_("blue")
@@ -56,8 +60,10 @@ public:
   {
     this->add_option('b', "block-size",  required_argument, "Size (in pixels) of each square blocks representing matrix entries.");
     this->add_option('c', "color",       required_argument, "Color of the matrix entries in the output SVG file. Any color spec that is defined in the SVG standard is allowed.");
+    this->add_option('d', "darken",       required_argument, "Overcount nonzero elements in matrix tiles; useful for very sparse matrices.  Requires a single argument BIAS, which is a floating point number (1.0 is the default and gives a faithful count of nonzeroes). This option has no effect when not shrinking (default, see the `-s` option).");
     this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries; disable if NUM is 0 (default). Mutually incompatible with `-e`");
     this->add_option('j', "grid-color",  required_argument, "Color of the grid axes (if any).");
+    this->add_option('s', "shrink",      required_argument, "One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1-1 to matrix entries.");
     this->add_option('k', "frame-color", required_argument, "Color of the enclosing box.");
     this->add_option('x', "num-vert-axes",  required_argument, "Draw NUM vertical axes, equally spaced across the entire picture width. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->add_option('y', "num-horiz-axes", required_argument, "Draw NUM horizontal axes, equally spaced across the entire picture height. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
@@ -72,6 +78,8 @@ public:
       std::istringstream(argument) >> size_;
     else if ('c' == opt)
       entry_color_ = argument;
+    else if ('d' == opt)
+      std::istringstream(argument) >> darken_;
     else if ('g' == opt) {
       std::istringstream(argument) >> xticks_;
       yticks_ = xticks_;
@@ -80,6 +88,8 @@ public:
       grid_color_ = argument;
     else if ('k' == opt)
       frame_color_ = argument;
+    else if ('s' == opt)
+      std::istringstream(argument) >> shrink_;
     else if ('x' == opt) {
       // a negative value for `xticks_` is interpreted as a request to
       // create that many equally-spaced axes
@@ -110,13 +120,14 @@ public:
 
 
     SMSReader<val_t>::open(*FilterProgram::input_);
+
     // draw frame around matrix
     coord_t nrows = SMSReader<val_t>::rows();
     coord_t ncols = SMSReader<val_t>::columns();
     (*output_)
       << "<rect class=\"MatrixFrame\" x=\"0\" y=\"0\""
-      << " height=\"" << (size_ * nrows) << "\""
-      << " width=\"" << (size_ * ncols) << "\""
+      << " height=\"" << (size_ * nrows / shrink_) << "\""
+      << " width=\"" << (size_ * ncols / shrink_) << "\""
       << " />"
       << std::endl;
 
@@ -125,31 +136,31 @@ public:
 
     if (xticks_ < 0) {
       const coord_t divs = -xticks_;
-      xticks_ = (ncols/divs);
+      xticks_ = (ncols/shrink_/divs);
     };
 
     if (yticks_ < 0) {
       const coord_t divs = -yticks_;
-      yticks_ = (nrows/divs);
+      yticks_ = (nrows/shrink_/divs);
     };
 
     // vertical axes (x-ticks)
     xticks_ *= size_;
     yticks_ *= size_;
-    int const max_digits = (1 + floor(log10(std::max(nrows, ncols))));
+    int const max_digits = (1 + floor(log10(std::max(nrows, ncols) / shrink_)));
     const coord_t pt = (std::min(xticks_, yticks_) / (2 * max_digits));
 
     if (0 != xticks_)
       {
         const coord_t dy = (xticks_ / 3);
-        for (coord_t j = xticks_; j < ncols*size_; j += xticks_) {
+        for (coord_t j = xticks_; j < ncols*size_/shrink_; j += xticks_) {
           // vertical axis
           (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << j << "\""
             << " y1=\"" << 0 - dy << "\""
             << " x2=\"" << j << "\""
-            << " y2=\"" << nrows*size_ + dy << "\""
+            << " y2=\"" << nrows*size_/shrink_ + dy << "\""
             << " />"
             << std::endl;
           // top label
@@ -158,7 +169,7 @@ public:
             << " x=\"" << j << "\""
             << " y=\"" << 0 - dy << "\">\n"
             << "<tspan>\n"
-            << (j / size_)
+            << (j*shrink_ / size_)
             << "</tspan>\n"
             << "</text>\n"
             << std::endl;
@@ -166,9 +177,9 @@ public:
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " x=\"" << j << "\""
-            << " y=\"" << nrows*size_ + dy << "\">\n"
+            << " y=\"" << nrows*size_/shrink_ + dy << "\">\n"
             << "<tspan>\n"
-            << (j / size_)
+            << (j*shrink_ / size_)
             << "</tspan>\n"
             << "</text>\n"
             << std::endl;
@@ -179,12 +190,12 @@ public:
     if (0 != yticks_)
       {
         const coord_t dx = (yticks_ / 3);
-        for (coord_t i = yticks_; i < (nrows * size_); i += yticks_) {
+        for (coord_t i = yticks_; i < (nrows * size_ / shrink_); i += yticks_) {
           (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << 0 << "\""
             << " y1=\"" << i << "\""
-            << " x2=\"" << ncols*size_ << "\""
+            << " x2=\"" << ncols*size_/shrink_ << "\""
             << " y2=\"" << i << "\""
             << " />"
             << std::endl;
@@ -193,16 +204,16 @@ public:
             << " y=\"" << i << "\""
             << " x=\"" << 0 - dx - max_digits*pt << "\">\n"
             << "<tspan>\n"
-            << (i / size_)
+            << (i*shrink_ / size_)
             << "</tspan>\n"
             << "</text>\n"
             << std::endl;
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " y=\"" << i << "\""
-            << " x=\"" << ncols*size_ + dx << "\">\n"
+            << " x=\"" << ncols*size_/shrink_ + dx << "\">\n"
             << "<tspan>\n"
-            << (i / size_)
+            << (i*shrink_ / size_)
             << "</tspan>\n"
             << "</text>\n"
             << std::endl;
@@ -211,6 +222,19 @@ public:
 
     // one rect per matrix entry
     read();
+    for(matrix_density_t::const_iterator r = m_.begin(); r != m_.end(); ++r)
+      for(row_density_t::const_iterator c = r->second.begin(); c != r->second.end(); ++c) {
+        const coord_t i = r->first;
+        const coord_t j = c->first;
+        (*output_)
+          << "<rect class=\"MatrixEntry\""
+          << " style='opacity:" << std::pow(m_[i][j], darken_) / (shrink_ * shrink_) << "'"
+          << " width=\"" << size_ << "\" height=\"" << size_ << "\""
+          << " x=\"" << ((j-1)*size_) << "\""
+          << " y=\"" << ((i-1)*size_) << "\""
+          << " />"
+          << std::endl;
+      };
 
     // write closing XML elements
     (*output_)
@@ -225,23 +249,26 @@ public:
   void process_entry(const coord_t i, const coord_t j, const val_t& value)
   {
     if (not is_zero(value))
-      (*output_)
-        << "<rect class=\"MatrixEntry\""
-        << " width=\"" << size_ << "\" height=\"" << size_ << "\""
-        << " x=\"" << ((j-1)*size_) << "\""
-        << " y=\"" << ((i-1)*size_) << "\""
-        << " />"
-        << std::endl;
+      m_[i / shrink_][j / shrink_] += 1;
   };
 
 
 private:
   coord_t      size_;
+  coord_t      shrink_;
+  double       darken_;
   coord_t      xticks_;
   coord_t      yticks_;
   std::string  entry_color_;
   std::string  frame_color_;
   std::string  grid_color_;
+
+  /// a sparse row is just a map from column index to value
+  typedef std::map< coord_t, double > row_density_t;
+  /// a sparse matrix is a map from row index to sparse row
+  typedef std::map< coord_t, row_density_t > matrix_density_t;
+  /// matrix data (as read from the stream)
+  matrix_density_t m_;
 };
 
 
