@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010-2012 riccardo.murri@gmail.com. All rights reserved.
+ * Copyright (c) 2010-2013 riccardo.murri@gmail.com. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -542,7 +542,7 @@ FilterProgram::set_output_format(entry_format notation, const int precision)
 int
 FilterProgram::main(int argc, char** argv)
 {
-  if (argc < 2) {
+  if (argc < 1) {
     std::cerr << "Type '" <<argv[0]<< " --help' to get usage help." << std::endl;
     return 1;
   };
