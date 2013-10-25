@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sms-info sms-norm sms-random sms-randminor \
-	sms-reordcols sms-reordrows sms-rescale sms-shrink \
-	sms-transpose sms-to-svg sms-wellknown
+bin_PROGRAMS = sms-blockechelon sms-info sms-norm sms-random \
+	sms-randminor sms-reordcols sms-reordrows sms-rescale \
+	sms-shrink sms-transpose sms-to-svg sms-wellknown
 man1_MANS = sms-info.1 sms-norm.1 sms-random.1 sms-randminor.1 \
 	sms-reordcols.1	sms-reordrows.1 sms-rescale.1 sms-shrink.1 \
 	sms-transpose.1 sms-to-svg.1 sms-wellknown.1
@@ -22,3 +22,4 @@ sms_wellknown_SOURCES = sms-wellknown.cpp
 
 ACLOCAL_AMFLAGS = -I build-aux/m4
 AM_CPPFLAGS = -I$(srcdir) -I$(top_srcdir) $(BOOST_CPPFLAGS)
+
