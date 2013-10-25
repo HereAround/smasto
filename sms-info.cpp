@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010-2012 riccardo.murri@gmail.com.  All rights reserved.
+ * Copyright (c) 2010-2013 riccardo.murri@gmail.com.  All rights reserved.
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -37,23 +37,19 @@
 // matrix dimensions should fit into a `long` integer type
 typedef long coord_t;
 
-// always select the widest floating-point type available
-# ifdef HAVE_LONG_DOUBLE
-typedef long double val_t;
-# else
-typedef double val_t;
-# endif 
+// do not care about the type of the entries, just check if they are zero/nonzero
+typedef std::string val_t;
 
 
-class InfoProgram : public FilterProgram, 
+class InfoProgram : public FilterProgram,
                     public SMSReader<val_t>
 {
 public:
-  InfoProgram() 
+  InfoProgram()
     : nnz_(0), short_(false)
   {
     this->add_option('s', "short",  no_argument, "One-line output format");
-    this->description = 
+    this->description =
       "Output information on the matrix given in the INPUT stream:\n"
       "number of rows and columns, number of nonzero values, density.\n"
       ;
@@ -65,7 +61,7 @@ public:
       short_ = true;
   };
 
-  int run() { 
+  int run() {
     SMSReader<val_t>::open(*FilterProgram::input_);
     coord_t nrows = SMSReader<val_t>::rows();
     coord_t ncols = SMSReader<val_t>::columns();
@@ -73,9 +69,9 @@ public:
     SMSReader<val_t>::close();
 
     if (short_) {
-      (*output_) << "rows:" << nrows 
-                 << " columns:" << ncols 
-                 << " nonzero:" << nnz_ 
+      (*output_) << "rows:" << nrows
+                 << " columns:" << ncols
+                 << " nonzero:" << nnz_
                  << " density:" << (100.0 * nnz_ / nrows / ncols) << std::endl;
     }
     else {
@@ -84,12 +80,12 @@ public:
       (*output_) << "Non-zeros: " << nnz_ << std::endl;
       (*output_) << "Density%: " << (100.0 * nnz_ / nrows / ncols) << std::endl;
     };
-    return 0; 
+    return 0;
   };
 
   void process_entry(const coord_t i, const coord_t j, const val_t& value)
   {
-    if (0 != value)
+    if (not is_zero(value))
       ++nnz_;
   };
 
