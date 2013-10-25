@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010, 2011, 2012 riccardo.murri@gmail.com.  All rights reserved.
+ * Copyright (c) 2010-2013 riccardo.murri@gmail.com.  All rights reserved.
  *
  *
  * This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 
 #include "common.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -47,16 +48,19 @@ class SvgProgram : public FilterProgram,
 public:
   SvgProgram()
     : size_(5)
-    , ticks_(120)
+    , xticks_(0)
+    , yticks_(0)
     , entry_color_("blue")
     , frame_color_("black")
     , grid_color_("silver")
   {
     this->add_option('b', "block-size",  required_argument, "Size (in pixels) of each square blocks representing matrix entries.");
     this->add_option('c', "color",       required_argument, "Color of the matrix entries in the output SVG file. Any color spec that is defined in the SVG standard is allowed.");
-    this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries (default 120); disable if NUM is 0.");
+    this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries; disable if NUM is 0 (default). Mutually incompatible with `-e`");
     this->add_option('j', "grid-color",  required_argument, "Color of the grid axes (if any).");
     this->add_option('k', "frame-color", required_argument, "Color of the enclosing box.");
+    this->add_option('x', "num-vert-axes",  required_argument, "Draw NUM vertical axes, equally spaced across the entire picture width. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
+    this->add_option('y', "num-horiz-axes", required_argument, "Draw NUM horizontal axes, equally spaced across the entire picture height. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->description =
       "Write to OUTPUT a representation of the nonzero pattern of the INPUT matrix.\n"
       ;
@@ -68,12 +72,26 @@ public:
       std::istringstream(argument) >> size_;
     else if ('c' == opt)
       entry_color_ = argument;
-    else if ('g' == opt)
-      std::istringstream(argument) >> ticks_;
+    else if ('g' == opt) {
+      std::istringstream(argument) >> xticks_;
+      yticks_ = xticks_;
+    }
     else if ('j' == opt)
       grid_color_ = argument;
     else if ('k' == opt)
       frame_color_ = argument;
+    else if ('x' == opt) {
+      // a negative value for `xticks_` is interpreted as a request to
+      // create that many equally-spaced axes
+      std::istringstream(argument) >> xticks_;
+      xticks_ = -xticks_;
+    }
+    else if ('y' == opt) {
+      // a negative value for `yticks_` is interpreted as a request to
+      // create that many equally-spaced ayes
+      std::istringstream(argument) >> yticks_;
+      yticks_ = -yticks_;
+    };
   };
 
   int run() {
@@ -103,13 +121,28 @@ public:
       << std::endl;
 
     // draw ticks marks
-    if (0 != ticks_)
+    //
+
+    if (xticks_ < 0) {
+      const coord_t divs = -xticks_;
+      xticks_ = (ncols/divs);
+    };
+
+    if (yticks_ < 0) {
+      const coord_t divs = -yticks_;
+      yticks_ = (nrows/divs);
+    };
+
+    int const max_digits = (1 + floor(log10(std::max(nrows, ncols))));
+
+    // draw vertical axes (x-ticks)
+    if (0 != xticks_)
       {
-        ticks_ *= size_;
-        int max_digits = (1 + floor(log10(std::max(nrows, ncols))));
-        coord_t dy = (ticks_ / 3);
-        coord_t pt = (ticks_ / (2 * max_digits));
-        for (coord_t j = ticks_; j < ncols*size_; j += ticks_) {
+        xticks_ *= size_;
+        const coord_t dy = (xticks_ / 3);
+        const coord_t pt = (xticks_ / (2 * max_digits));
+        for (coord_t j = xticks_; j < ncols*size_; j += xticks_) {
+          // vertical axis
           (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << j << "\""
@@ -118,6 +151,7 @@ public:
             << " y2=\"" << nrows*size_ + dy << "\""
             << " />"
             << std::endl;
+          // top label
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " x=\"" << j << "\""
@@ -127,6 +161,7 @@ public:
             << "</tspan>\n"
             << "</text>\n"
             << std::endl;
+          // bottom label
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " x=\"" << j << "\""
@@ -137,7 +172,15 @@ public:
             << "</text>\n"
             << std::endl;
         };
-        for (coord_t i = ticks_; i < (nrows * size_); i += ticks_) {
+      }; // if (0 != xticks_)
+
+    // draw horizontal axes (y-ticks)
+    if (0 != yticks_)
+      {
+        yticks_ *= size_;
+        const coord_t dx = (yticks_ / 3);
+        const coord_t pt = (yticks_ / (2 * max_digits));
+        for (coord_t i = yticks_; i < (nrows * size_); i += yticks_) {
           (*output_)
             << "<line class=\"MatrixSeparator\""
             << " x1=\"" << 0 << "\""
@@ -149,7 +192,7 @@ public:
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " y=\"" << i << "\""
-            << " x=\"" << 0 - dy - max_digits*pt << "\">\n"
+            << " x=\"" << 0 - dx - max_digits*pt << "\">\n"
             << "<tspan>\n"
             << (i / size_)
             << "</tspan>\n"
@@ -158,7 +201,7 @@ public:
           (*output_)
             << "<text font-size=\"" << pt << "\""
             << " y=\"" << i << "\""
-            << " x=\"" << ncols*size_ + dy << "\">\n"
+            << " x=\"" << ncols*size_ + dx << "\">\n"
             << "<tspan>\n"
             << (i / size_)
             << "</tspan>\n"
@@ -195,7 +238,8 @@ public:
 
 private:
   coord_t      size_;
-  coord_t      ticks_;
+  coord_t      xticks_;
+  coord_t      yticks_;
   std::string  entry_color_;
   std::string  frame_color_;
   std::string  grid_color_;
