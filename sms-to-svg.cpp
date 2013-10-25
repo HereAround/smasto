@@ -153,8 +153,8 @@ public:
     // draw frame around matrix
     (*output_)
       << "<rect class=\"MatrixFrame\" x=\"0\" y=\"0\""
-      << " height=\"" << (size_ * nrows / shrink_) << "\""
-      << " width=\"" << (size_ * ncols / shrink_) << "\""
+      << " height=\"" << size_ * (1 + nrows / shrink_) << "\""
+      << " width=\"" << size_ * (1 + ncols / shrink_) << "\""
       << " />"
       << std::endl;
 
@@ -247,8 +247,8 @@ public:
           << "<rect class=\"MatrixEntry\""
           << " style='opacity:" << std::pow(m_[i][j], darken_) / (shrink_ * shrink_) << "'"
           << " width=\"" << size_ << "\" height=\"" << size_ << "\""
-          << " x=\"" << ((j-1)*size_) << "\""
-          << " y=\"" << ((i-1)*size_) << "\""
+          << " x=\"" << (j*size_) << "\""
+          << " y=\"" << (i*size_) << "\""
           << " />"
           << std::endl;
       };
