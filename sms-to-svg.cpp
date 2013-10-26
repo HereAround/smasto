@@ -60,19 +60,46 @@ public:
     , frame_color_("black")
     , grid_color_("silver")
   {
-    this->add_option('b', "block-size",  required_argument, "Size (in pixels) of each square blocks representing matrix entries.");
+    this->add_option('b', "block-size",  required_argument, "Size (in pixels) of each square dot representing matrix entries.");
     this->add_option('c', "color",       required_argument, "Color of the matrix entries in the output SVG file. Any color spec that is defined in the SVG standard is allowed.");
-    this->add_option('d', "darken",       required_argument, "Overcount nonzero elements in matrix tiles; useful for very sparse matrices.  Requires a single argument BIAS, which is a floating point number (1.0 is the default and gives a faithful count of nonzeroes). This option has no effect when not shrinking (default, see the `-s` option).");
-    this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries; disable if NUM is 0 (default). Mutually incompatible with `-e`");
+    this->add_option('d', "darken",       required_argument, "Overcount nonzero elements in matrix tiles. This option has effect only when shrinking.");
+    this->add_option('g', "grid",        required_argument, "Draw axes every NUM entries; disable if NUM is 0 (default). Mutually incompatible with `-x` and `-y`.");
     this->add_option('j', "grid-color",  required_argument, "Color of the grid axes (if any).");
     this->add_option('k', "frame-color", required_argument, "Color of the enclosing box.");
-    this->add_option('s', "shrink",      required_argument, "One pixel in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: pixels in SVG correspond 1-1 to matrix entries.  Mutually exclusive with options `-T` and `-W`.");
-    this->add_option('t', "shrink-to-height", required_argument, "Scale the output image so that the drawing area is at most NUM pixels tall. Mutually exclusive with options `-s` and `-W`.");
-    this->add_option('w', "shrink-to-width", required_argument, "Scale the output image so that the drawing area is at most NUM pixels wide.  Mutually exclusive with options `-s` and `-T`.");
+    this->add_option('s', "shrink",      required_argument, "One dot in the SVG output corresponds to a NUM by NUM square in the INPUT matrix. Default: dots in SVG OUTPUT correspond 1-1 to matrix entries in INPUT.");
+    this->add_option('t', "shrink-to-height", required_argument, "Scale the output image so that the drawing area is at most NUM pixels tall. Mutually exclusive with options `-s` and `-w`.");
+    this->add_option('w', "shrink-to-width", required_argument, "Scale the output image so that the drawing area is at most NUM pixels wide.  Mutually exclusive with options `-s` and `-t`.");
     this->add_option('x', "num-vert-axes",  required_argument, "Draw NUM vertical axes, equally spaced across the entire picture width. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->add_option('y', "num-horiz-axes", required_argument, "Draw NUM horizontal axes, equally spaced across the entire picture height. Disable if NUM is 0 (default). Mutually incompatible with `-g`.");
     this->description =
-      "Write to OUTPUT a representation of the nonzero pattern of the INPUT matrix.\n"
+      "Draw a picture of the nonzero pattern of the INPUT matrix into the\n"
+      "OUTPUT stream in SVG format.\n"
+      "\n"
+      "Normally, one entry in the INPUT matrix corresponds to one single\n"
+      "square 'dot' in the OUTPUT picture.  The size of the 'dot' in pixels\n"
+      "can be set with the `--block-size` option.\n"
+      "\n"
+      "For large matrices, it is possible to shrink the OUTPUT picture, by\n"
+      "mapping a square NxN tile of the matrix into a single dot.  Option\n"
+      "`--shrink` specifies the size N of input tiles. Alternatively, options\n"
+      "`--shrink-to-width` (resp. `--shrink-to-height`) allow setting the\n"
+      "tile size so that the OUTPUT picture does not exceed the specified\n"
+      "width (resp. height), expressed in pixels.  The `--shrink`,\n"
+      "`--shrink-to-width` and `--shrink-to-height` options are mutually\n"
+      "conflicting; if more than one is specified, the last takes precedence.\n"
+      "\n"
+      "When shrinking the matrix, pixel color intensity is proportional to\n"
+      "the number of nonzeroes in each INPUT tile.  For very sparse matrices,\n"
+      "option `--darken` allows to enhance the contrast: given a\n"
+      "floating-point number BETA, the number of nonzero INPUT entries found\n"
+      "in a tile is raised to the power BETA before computing the intensity.\n"
+      "\n"
+      "Optionally, grid axes can be drawn on the OUTPUT picture.  Option\n"
+      "`--grid` draws a square grid, with axes spaced NUM pixels apart.\n"
+      "Option `--num-vert-axes` requires that the specified number of\n"
+      "vertical axes are drawn, equally spaced apart.  Option\n"
+      "`--num-horiz-axes` does the same for horizontal axes.  Passing an\n"
+      "argument 0 to each of these options turns off drawing axes.\n"
       ;
   };
 
