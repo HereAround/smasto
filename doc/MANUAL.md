@@ -93,15 +93,17 @@ where the norm of the matrix will be written to; leave it
 out to have the norm printed to your terminal screen.
 
 Options:
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.|
-|-------------------|------------------------------------------------------------------|
-|-F, --fixed        |Output matrix entry values using fixed notation.                  |
-|-E, --scientific   |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG   |Write output matrix to file ARG.                                  |
-|-i, --input ARG    |Read input matrix from file ARG.                                  |
-|-V, --version      |Print version string.                                             |
-|-h, --help         |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-norm ###
@@ -113,23 +115,25 @@ Note that OUTPUT is not a matrix here, rather a UNIX stream
 where the norm of the matrix will be written to; leave it
 out to have the norm printed to your terminal screen.
 
-Options allow to choose whether the L<sup>1, L</sup>2 or L^\infty
-norm should be computed.  The INPUT matrix stream should be
-in J.-G. Dumas' SMS format.
+Options allow to choose whether the L<sup>1</sup>, L<sup>2</sup> or
+L<sup>\infty</sup> norm should be computed.  The INPUT matrix stream
+should be in J.-G. Dumas' SMS format.
 
 Options:
-|-m, --max          |Compute L<sup>\infty</sup> norm                                            |
-|-------------------|---------------------------------------------------------------------------|
-|-2, --l2           |Compute L<sup>2</sup> norm                                                 |
-|-1, --l1           |Compute L<sup>1</sup> norm                                                 |
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.         |
-|-F, --fixed        |Output matrix entry values using fixed notation.                           |
-|-E, --scientific   |Output matrix entry values using scientifc notation.                       |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.         |
-|-o, --output ARG   |Write output matrix to file ARG.                                           |
-|-i, --input ARG    |Read input matrix from file ARG.                                           |
-|-V, --version      |Print version string.                                                      |
-|-h, --help         |Print help text.                                                           |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -m, --max           | Compute L<sup>\infty</sup> norm                                    |
+| -2, --l2            | Compute L<sup>2</sup> norm                                         |
+| -1, --l1            | Compute L<sup>1</sup> norm                                         |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-randminor ###
@@ -144,22 +148,24 @@ and columns containing nonzero entries: therefore small minors have a
 likely chance of being entirely null.
 
 Options:
-|-R, --rows ARG     |Number of rows in the minor to extract.                           |
-|-------------------|------------------------------------------------------------------|
-|-C, --columns ARG  |Number of columns in the minor to extract.                        |
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.|
-|-F, --fixed        |Output matrix entry values using fixed notation.                  |
-|-E, --scientific   |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG   |Write output matrix to file ARG.                                  |
-|-i, --input ARG    |Read input matrix from file ARG.                                  |
-|-V, --version      |Print version string.                                             |
-|-h, --help         |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -R, --rows ARG      | Number of rows in the minor to extract.                            |
+| -C, --columns ARG   | Number of columns in the minor to extract.                         |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-random ###
 
-Usage: sms-random [options](options.md) [[OUTPUT](INPUT.md)]
+Usage: sms-random _options_ _OUTPUT_
 
 Generate a random sparse matrix of the given size and write it to OUTPUT.
 Each entry has a probability of being nonzero equal to the DENSITY.
@@ -167,16 +173,18 @@ Entry values are uniformly distributed real numbers between 0 and 1;
 use the '-I N' option to generate integer entries in the range 1 to N.
 
 Options:
-|-I, --integer ARG  |Matrix has integer entries in the range 1 to ARG.                 |
-|-------------------|------------------------------------------------------------------|
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.|
-|-F, --fixed        |Output matrix entry values using fixed notation.                  |
-|-E, --scientific   |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG   |Write output matrix to file ARG.                                  |
-|-i, --input ARG    |Read input matrix from file ARG.                                  |
-|-V, --version      |Print version string.                                             |
-|-h, --help         |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -I, --integer ARG   | Matrix has integer entries in the range 1 to ARG.                  |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-reord ###
@@ -203,20 +211,22 @@ the matrix and computing the rank is greater than directly computing
 the rank of the initial matrix.
 
 Options:
-|-e, --weight-e ARG |Assign weight ARG (default: 0.5) to criterion e.                  |
-|-------------------|------------------------------------------------------------------|
-|-d, --weight-d ARG |Assign weight ARG (default: 2) to criterion d.                    |
-|-c, --weight-c ARG |Assign weight ARG (default: 1) to criterion c.                    |
-|-b, --weight-b ARG |Assign weight ARG (default: 2) to criterion b.                    |
-|-a, --weight-a ARG |Assign weight ARG (default: 4.5) to criterion a.                  |
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.|
-|-F, --fixed        |Output matrix entry values using fixed notation.                  |
-|-E, --scientific   |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG   |Write output matrix to file ARG.                                  |
-|-i, --input ARG    |Read input matrix from file ARG.                                  |
-|-V, --version      |Print version string.                                             |
-|-h, --help         |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -e, --weight-e ARG  | Assign weight ARG (default: 0.5) to criterion e.                   |
+| -d, --weight-d ARG  | Assign weight ARG (default: 2) to criterion d.                     |
+| -c, --weight-c ARG  | Assign weight ARG (default: 1) to criterion c.                     |
+| -b, --weight-b ARG  | Assign weight ARG (default: 2) to criterion b.                     |
+| -a, --weight-a ARG  | Assign weight ARG (default: 4.5) to criterion a.                   |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-rescale ###
@@ -230,17 +240,19 @@ Both the INPUT and the OUTPUT matrix streams are in J.-G.
 Dumas' SMS format.
 
 Options:
-|-r, --divide ARG   |Divide each entry by ARG.                                         |
-|-------------------|------------------------------------------------------------------|
-|-m, --multiply ARG |Multiply each entry by ARG.                                       |
-|-G, --default      |Choose fixed or scientific notation based on how large a value is.|
-|-F, --fixed        |Output matrix entry values using fixed notation.                  |
-|-E, --scientific   |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG|Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG   |Write output matrix to file ARG.                                  |
-|-i, --input ARG    |Read input matrix from file ARG.                                  |
-|-V, --version      |Print version string.                                             |
-|-h, --help         |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -r, --divide ARG    | Divide each entry by ARG.                                          |
+| -m, --multiply ARG  | Multiply each entry by ARG.                                        |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-shrink ###
@@ -252,15 +264,17 @@ entirely of zeroes.  Rows and columns are renumbered to preserve the
 relative order in which they appear in the INPUT matrix.
 
 Options:
-|-G, --default       |Choose fixed or scientific notation based on how large a value is.|
-|--------------------|------------------------------------------------------------------|
-|-F, --fixed         |Output matrix entry values using fixed notation.                  |
-|-E, --scientific    |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG |Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG    |Write output matrix to file ARG.                                  |
-|-i, --input ARG     |Read input matrix from file ARG.                                  |
-|-V, --version       |Print version string.                                             |
-|-h, --help          |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-transpose ###
@@ -276,17 +290,19 @@ Both the INPUT and the OUTPUT matrix streams are in J.-G.
 Dumas' SMS format.
 
 Options:
-|-R, --tall          |Only transpose if the output matrix has more rows than columns.   |
-|--------------------|------------------------------------------------------------------|
-|-C, --wide          |Only transpose if the output matrix has more columns than rows.   |
-|-G, --default       |Choose fixed or scientific notation based on how large a value is.|
-|-F, --fixed         |Output matrix entry values using fixed notation.                  |
-|-E, --scientific    |Output matrix entry values using scientifc notation.              |
-|-p, --precision ARG |Set number of significant digits for printing matrix entry values.|
-|-o, --output ARG    |Write output matrix to file ARG.                                  |
-|-i, --input ARG     |Read input matrix from file ARG.                                  |
-|-V, --version       |Print version string.                                             |
-|-h, --help          |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -R, --tall          | Only transpose if the output matrix has more rows than columns.    |
+| -C, --wide          | Only transpose if the output matrix has more columns than rows.    |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
 
 
 ### sms-to-svg ###
@@ -303,13 +319,15 @@ the frame and the axes can be chosen with options.  Colors may be
 specified in any format that is valid in an SVG file, e.g., `black` or
 `rgb(0,0,0)`.
 
-|-b, --block-size    |Set edge length of nonzero blocks (in pixels).                    |
-|--------------------|------------------------------------------------------------------|
-|-c, --color C       |Set color of nonzero blocks.                                      |
-|-g, --grid NUM      |Draw axes every NUM entries; if NUM is 0, disable drawing axes.   |
-|-j, --frame-color C |Set color of the enclosing frame.                                 |
-|-k, --grid-color  C |Set color of the axes (if drawn).                                 |
-|-o, --output ARG    |Write output to file ARG.                                         |
-|-i, --input ARG     |Read input matrix from file ARG.                                  |
-|-V, --version       |Print version string.                                             |
-|-h, --help          |Print help text.                                                  |
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -b, --block-size    | Set edge length of nonzero blocks (in pixels).                    |
+| -c, --color C       | Set color of nonzero blocks.                                      |
+| -g, --grid NUM      | Draw axes every NUM entries; if NUM is 0, disable drawing axes.   |
+| -j, --frame-color C | Set color of the enclosing frame.                                 |
+| -k, --grid-color  C | Set color of the axes (if drawn).                                 |
+| -o, --output ARG    | Write output to file ARG.                                         |
+| -i, --input ARG     | Read input matrix from file ARG.                                  |
+| -V, --version       | Print version string.                                             |
+| -h, --help          | Print help text.                                                  |
