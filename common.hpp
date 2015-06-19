@@ -329,6 +329,9 @@ void SMSReader<val_t,coord_t>::open(const std::string& filename)
 template< typename val_t, typename coord_t >
 void SMSReader<val_t,coord_t>::read()
 {
+  // eof() only works if a read has been attempted
+  (*input_).peek();
+
   while (not (*input_).eof()) {
     coord_t i, j;
     val_t value;
