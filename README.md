@@ -15,7 +15,7 @@ Tools currently included in SMaSTo include:
 * `sms-shrink`: Remove rows and columns consisting entirely of zeroes.
 * `sms-transpose`: Transpose matrix.
 
-For more details, installation and usage instructions, visit the [docs](docs/).
+For more details, installation and usage instructions, read the [manual](doc/MANUAL.md)
 Comments and patches are welcome!
 
 
