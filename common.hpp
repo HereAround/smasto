@@ -7,7 +7,7 @@
  * @version $Revision$
  */
 /*
- * Copyright (c) 2010-2013 riccardo.murri@gmail.com. All rights reserved.
+ * Copyright (c) 2010-2013, 2015 riccardo.murri@gmail.com. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -220,6 +220,9 @@ protected:
 
   entry_format notation_;
   int precision_;
+
+  int argc_;
+  char **argv_;
 };
 
 
@@ -648,6 +651,10 @@ FilterProgram::main(int argc, char** argv)
     if (optind > 0)
       argv[optind-1] = argv[0];
     parse_args(argc - (optind-1), &(argv[optind-1]));
+
+    // save for possible re-use in run()
+    argc_ = argc;
+    argv_ = argv;
 
     // now do stuff
     return run();

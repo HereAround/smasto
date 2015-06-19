@@ -1,12 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sms-blockechelon sms-info sms-norm sms-random \
+bin_PROGRAMS = sms-adjoin sms-blockechelon sms-info sms-norm sms-random \
 	sms-randminor sms-reordcols sms-reordrows sms-rescale \
 	sms-shrink sms-transpose sms-to-svg sms-wellknown
-man1_MANS = sms-info.1 sms-norm.1 sms-random.1 sms-randminor.1 \
+man1_MANS = sms-adjoin.1 sms-info.1 sms-norm.1 sms-random.1 sms-randminor.1 \
 	sms-reordcols.1	sms-reordrows.1 sms-rescale.1 sms-shrink.1 \
 	sms-transpose.1 sms-to-svg.1 sms-wellknown.1
 
+sms_adjoin_SOURCES = sms-adjoin.cpp
 sms_info_SOURCES = sms-info.cpp
 sms_norm_SOURCES = sms-norm.cpp
 sms_random_SOURCES = sms-random.cpp
