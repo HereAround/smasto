@@ -307,7 +307,7 @@ template< typename val_t, typename coord_t >
 void SMSReader<val_t,coord_t>::open(const std::string& filename)
 {
   errno = 0;
-  std::ifstream input(filename);
+  std::ifstream input(filename.c_str());
   if (input.good())
     input_ = input;
   else {
