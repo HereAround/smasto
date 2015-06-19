@@ -81,6 +81,32 @@ argument and the `-i` option are provided, only the INPUT argument is
 retained.  Similarly for simultaneous specification of OUTPUT and `-o`.
 
 
+### sms-adjoin ###
+
+Usage: sms-adjoin _options_ _INPUT1_ _INPUT2_ _OUTPUT_
+
+Adjoin the two matrices _INPUT1_ and _INPUT2_; the _OUTPUT_ matrix is
+formed by either concatenating corresponding rows of _INPUT1_ and
+_INPUT2_ (i.e., matrices are adjoined side-by-side; this is the
+default), or concatenating corresponding columns of _INPUT1_ and
+_INPUT2_ (i.e., matrices are stacked one on top of the other).
+
+If _OUTPUT_ is omitted, it defaults to the standard output stream.
+
+| Option              | Meaning                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| -C, --stacked       | Concatenate matrix columns.                                        |
+| -E, --scientific    | Output matrix entry values using scientifc notation.               |
+| -F, --fixed         | Output matrix entry values using fixed notation.                   |
+| -G, --default       | Choose fixed or scientific notation based on how large a value is. |
+| -R, --side-by-side  | Concatenate matrix rows.                                           |
+| -V, --version       | Print version string.                                              |
+| -h, --help          | Print help text.                                                   |
+| -i, --input ARG     | Read input matrix from file ARG.                                   |
+| -o, --output ARG    | Write output matrix to file ARG.                                   |
+| -p, --precision ARG | Set number of significant digits for printing matrix entry values. |
+
+
 ### sms-info ###
 
 Usage: sms-info _options_ _INPUT_ _OUTPUT_
