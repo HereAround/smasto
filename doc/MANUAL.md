@@ -28,9 +28,9 @@ and [automake](http://www.gnu.org/software/automake/).
 There is no packaged version of SMaSTo at the moment, but you should
 be able to get it working by following these steps:
 
-0. Check out the SMaSTo sources with [SubVersion](http://subversion.tigris.org/):
+0. Check out the SMaSTo sources with [Git](http://git-scm.org/)
 ```
-    svn checkout http://smasto.googlecode.com/svn/trunk smasto
+    git clone https://github.com/riccardomurri/smasto.git
     cd smasto
 ```
 
