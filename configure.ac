@@ -3,12 +3,12 @@
 ##
 
 AC_PREREQ([2.63])
-AC_INIT([smasto], [0.10.12], [riccardo.murri@gmail.com], [], 
+AC_INIT([smasto], [0.15.6], [riccardo.murri@gmail.com], [], 
                   [http://smasto.googlecode.com/])
-AC_CONFIG_SRCDIR([sms-norm.cpp])
+AC_CONFIG_SRCDIR([src/sms-norm.cpp])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
-AM_INIT_AUTOMAKE([1.10 no-define])
+AM_INIT_AUTOMAKE([1.10 no-define subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 
