@@ -38,3 +38,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -- Riccardo Murri <riccardo.murri@gmail.com>
+
+For me the configure file fails with "error: invalid value: boost_major_version=".
+This can be fixed by altering the line 
+
+boost_cv_lib_version=`cat conftest.i`
+
+with the correct boost version. In my case 
+
+boost_cv_lib_version="1_65_1_1".
+
+On debian, this version can be found by issuing
+
+apt-cache show libboost-dev
